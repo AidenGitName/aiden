@@ -1,0 +1,31 @@
+version: 0.0
+os: linux
+files:
+  - source: ROOT.war
+    destination: /var/lib/tomcat8/webapps
+  - source: setenv.sh
+    destination: /usr/share/tomcat8/bin
+  - source: pinpoint.config
+    destination: /home/ubuntu/pinpoint-agent
+permissions:
+  - object: /usr/share/tomcat8/bin
+    pattern: "setenv.sh"
+    mode: 755
+    type:
+      - file
+hooks:
+  #ApplicationStop:
+  BeforeInstall:
+    - location: stop_application.sh
+      timeout: 300
+  #  - location: install_security.sh
+  #    timeout: 300
+    - location: install_dependencies.sh
+      timeout: 300
+  #AfterInstall:
+    #- location: 
+  ApplicationStart:
+    - location: start_application.sh
+      timeout: 300
+  #ValidateService:
+    #- location: basic_health_check.sh

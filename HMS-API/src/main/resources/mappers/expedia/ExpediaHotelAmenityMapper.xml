@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wonders.hms.expedia.persistence.ExpediaHotelAmenityMapper">
+
+    <resultMap id="expediaHotelAmenity" type="com.wonders.hms.expedia.vo.ExpediaHotelAmenity">
+        <result property="propertyId" column="wonder_hotel_id" />
+        <result property="amenity" column="amenity" />
+    </resultMap>
+
+    <select id="getAmenity" parameterType="java.util.Set" resultMap="expediaHotelAmenity" >
+        select c.id wonder_hotel_id, a.amenity amenity from expedia_hotel_amenity a, hotel_vendor_index b, wonder_hotel_info c
+        where c.hotel_vendor_index_id = b.id
+        and b.expedia_id = a.property_id
+        and c.id in
+     <foreach collection="propertyId" item="item" separator="," close=")" open="(">
+        #{item}
+     </foreach>
+    </select>
+    
+    <insert id="insertAmenity" >
+        INSERT INTO expedia_hotel_amenity (property_id, amenity) VALUES
+        <foreach collection="amenities" item="amenity" separator=",">
+            (#{propertyId}, #{amenity})
+        </foreach>
+    </insert>
+    
+</mapper>

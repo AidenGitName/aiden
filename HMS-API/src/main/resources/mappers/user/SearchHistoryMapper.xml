@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wonders.hms.user.persistence.SearchHistoryMapper">
+    <resultMap id="searchHistoryResult" type="com.wonders.hms.user.vo.SearchHistory">
+        <result property="id" column="id"/>
+        <result property="uuid" column="uuid"/>
+        <result property="mId" column="mid"/>
+        <result property="status" column="status"/>
+        <result property="exitedDate" column="exited_date"/>
+        <result property="statusUpdatedDate" column="status_updated_date"/>
+        <result property="price" column="price"/>
+        <result property="searchedPlace" column="searched_place"/>
+        <result property="checkin" column="checkin"/>
+        <result property="checkout" column="checkout"/>
+        <result property="numAdult" column="num_adult"/>
+        <result property="numRoom" column="num_room"/>
+        <result property="numChildren" column="num_children"/>
+        <result property="childrenAge" column="children_age"/>
+        <result property="resultUrl" column="result_url"/>
+        <result property="vendor" column="vendor"/>
+        <result property="reservationId" column="reservation_id"/>
+        <result property="reservationVendorUrl" column="reservation_vendor_url"/>
+        <result property="wonderHotelInfoId" column="wonder_hotel_info_id"/>
+        <result property="realHotelName" column="real_hotel_name"/>
+        <result property="realCityName" column="real_city_name"/>
+        <result property="realCheckin" column="real_check_in"/>
+        <result property="realCheckOut" column="real_check_out"/>
+        <result property="realPrice" column="real_price"/>
+        <result property="realHotelAddress" column="real_hotel_address"/>
+        <result property="realHotelPhon" column="real_hotel_phon"/>
+        <result property="realLatitude" column="real_latitude"/>
+        <result property="realLongitude" column="real_longitude"/>
+    </resultMap>
+
+    <resultMap id="myPageResult" type="com.wonders.hms.user.vo.MyPageHistory">
+        <result property="mid" column="mid"/>
+        <result property="checkout" column="real_check_out"/>
+        <result property="checkin" column="real_check_in"/>
+        <result property="reservationUrl" column="reservationUrl"/>
+        <result property="status" column="status"/>
+        <result property="hotelName" column="real_hotel_name"/>
+        <result property="hotelAddress" column="real_hotel_address"/>
+        <result property="hotelPhone" column="real_hotel_phon"/>
+        <result property="hotelCity" column="real_city_name"/>
+        <result property="hotelLatitude" column="real_latitude"/>
+        <result property="hotelLongitude" column="real_longitude"/>
+    </resultMap>
+
+    <insert id="insertSearchHistory" parameterType="com.wonders.hms.user.vo.SearchHistory" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO search_history (uuid, mid, status, price, searched_place, checkin, checkout, num_adult, num_room,
+          num_children, children_age, result_url, vendor, wonder_hotel_info_id, reservation_id, reservation_vendor_url,
+          real_hotel_name, real_city_name, real_check_in, real_check_out, real_price, real_hotel_address, real_hotel_phon,
+          real_latitude, real_longitude, rev_timestamp)
+        VALUES ( #{uuid}, #{mId}, #{status}, #{price}, #{searchedPlace}, #{checkin}, #{checkout}, #{numAdult}, #{numRoom},
+          #{numChildren}, #{childrenAge}, #{resultUrl}, #{vendor}, #{wonderHotelInfoId}, #{reservationId}, #{reservationVendorUrl},
+          #{realHotelName}, #{realCityName}, #{realCheckin}, #{realCheckOut}, #{realPrice}, #{realHotelAddress}, #{realHotelPhon},
+          #{realLatitude}, #{realLongitude}, <![CDATA[ (UNIX_TIMESTAMP() * -1) ]]>)
+    </insert>
+
+    <update id="updateSearchHitstory">
+        UPDATE search_history SET status=#{status}, reservation_id=#{reservationId}, reservation_vendor_url=#{reservationVendorUrl} WHERE uuid=#{uuid}
+    </update>
+
+    <update id="updateBookingDotComStatus">
+        UPDATE search_history SET booking_dot_com_status=1 WHERE uuid=#{uuid}
+    </update>
+
+    <update id="updateExpediaStatus">
+        UPDATE search_history SET expedia_status=1 WHERE uuid=#{uuid}
+    </update>
+
+    <select id="getSearchHistory" resultMap="searchHistoryResult">
+        SELECT * FROM search_history WHERE mid=#{mId}
+    </select>
+
+    <select id="getAllSearchHistory" resultMap="searchHistoryResult">
+        SELECT * FROM search_history
+    </select>
+
+    <select id="getSearchHistoryWithUuid" resultMap="searchHistoryResult">
+        SELECT * FROM search_history WHERE uuid=#{uuid}  <include refid="orderByStatusDate" />
+    </select>
+    
+    <select id="getLeastSearchHistoryBySearchHistoryObj" resultMap="searchHistoryResult">
+        SELECT * FROM search_history WHERE 1=1
+        <if test="id != null">AND id = #{id}</if>
+        <if test="uuid != uuid">AND uuid = #{uuid}</if>
+        <if test="mId != null">AND mid = #{mId}</if>
+        <if test="status != null">AND status = #{status}</if>
+        <if test="exitedDate != null">AND exited_date = #{exitedDate}</if>
+        <if test="statusUpdatedDate != null">AND status_updated_date = #{statusUpdatedDate}</if>
+        <if test="price != null">AND price = #{price}</if>
+        <if test="searchedPlace != null">AND searched_place = #{searchedPlace}</if>
+        <if test="checkin != null">AND checkin = #{checkin}</if>
+        <if test="checkout != null">AND checkout = #{checkout}</if>
+        <if test="numAdult != null">AND num_adult = #{numAdult}</if>
+        <if test="numRoom != null">AND num_room = #{numRoom}</if>
+        <if test="numChildren != null">AND num_children = #{numChildren}</if>
+        <if test="childrenAge != null">AND children_age = #{childrenAge}</if>
+        <if test="resultUrl != null">AND result_url = #{resultUrl}</if>
+        <if test="vendor != null">AND vendor = #{vendor}</if>
+        <if test="reservationId != null">AND reservation_id = #{reservationId}</if>
+        <if test="reservationVendorUrl != null">AND reservation_vendor_url = #{reservationVendorUrl}</if>
+        <if test="wonderHotelInfoId != null">AND wonder_hotel_info_id = #{wonderHotelInfoId}</if>
+        <if test="exitedDateFrom != null"><![CDATA[ AND exited_date >= ]]> #{exitedDateFrom}</if>
+        <if test="exitedDateTo != null"><![CDATA[ AND exited_date <= ]]> #{exitedDateTo}</if>
+
+        group by uuid
+        <include refid="orderByStatusDate" />
+    </select>
+
+    <select id="getLeastHistory" resultMap="searchHistoryResult">
+        select * from search_history a,
+        (
+          select uuid, max(status_updated_date) d
+          from search_history
+          where 1=1
+
+          <if test="id != null">AND id = #{id}</if>
+          <if test="uuid != uuid">AND uuid = #{uuid}</if>
+          <if test="mId != null">AND mid = #{mId}</if>
+          <if test="status != null">AND status = #{status}</if>
+          <if test="exitedDate != null">AND exited_date = #{exitedDate}</if>
+          <if test="statusUpdatedDate != null">AND status_updated_date = #{statusUpdatedDate}</if>
+          <if test="price != null">AND price = #{price}</if>
+          <if test="searchedPlace != null">AND searched_place = #{searchedPlace}</if>
+          <if test="checkin != null">AND checkin = #{checkin}</if>
+          <if test="checkout != null">AND checkout = #{checkout}</if>
+          <if test="numAdult != null">AND num_adult = #{numAdult}</if>
+          <if test="numRoom != null">AND num_room = #{numRoom}</if>
+          <if test="numChildren != null">AND num_children = #{numChildren}</if>
+          <if test="childrenAge != null">AND children_age = #{childrenAge}</if>
+          <if test="resultUrl != null">AND result_url = #{resultUrl}</if>
+          <if test="vendor != null">AND vendor = #{vendor}</if>
+          <if test="reservationId != null">AND reservation_id = #{reservationId}</if>
+          <if test="reservationVendorUrl != null">AND reservation_vendor_url = #{reservationVendorUrl}</if>
+          <if test="wonderHotelInfoId != null">AND wonder_hotel_info_id = #{wonderHotelInfoId}</if>
+          <if test="exitedDateFrom != null"><![CDATA[ AND exited_date >= ]]> #{exitedDateFrom}</if>
+          <if test="exitedDateTo != null"><![CDATA[ AND exited_date <= ]]> #{exitedDateTo}</if>
+          group by uuid
+        ) b
+
+        where a.status_updated_date = b.d
+        and a.uuid = b.uuid
+
+    </select>
+
+    <select id="getLeastBookedHistoryForAgoda" resultMap="searchHistoryResult">
+        select * from search_history a,
+        (
+            select uuid, max(status_updated_date) d
+            from search_history
+            where
+              <![CDATA[ str_to_date(checkin, '%Y-%m-%d') >= (current_date()) ]]>
+              and vendor='AGODA'
+            group by uuid
+        ) b
+        where a.status_updated_date = b.d
+        and a.uuid = b.uuid
+        and a.status='BOOKED'
+
+    </select>
+
+    <select id="getBookingDotComByBookingStatusSearchHistory" resultMap="searchHistoryResult">
+      SELECT * FROM search_history
+        WHERE uuid = #{uuid} AND booking_dot_com_status=#{bookingDotComStatus}
+        <include refid="orderByStatusDate" />LIMIT 0, 1
+    </select>
+
+    <select id="getExpediaByStatus" resultMap="searchHistoryResult">
+        select * from search_history
+        where uuid = #{uuid} and expedia_status=#{expediaStatus}
+        <include refid="orderByStatusDate" />LIMIT 0, 1
+    </select>
+
+    <select id="getPassedBook" resultMap="myPageResult">
+        SELECT a.mid mid, a.checkout checkout, a.checkin checkin, a.reservation_vendor_url reservationUrl, a.status status,
+        a.real_hotel_name real_hotel_name, a.real_city_name real_city_name, a.real_check_in real_check_in, a.real_check_out real_check_out, a.real_price real_price, a.real_hotel_address real_hotel_address, a.real_hotel_phon real_hotel_phon,
+        a.real_latitude real_latitude, a.real_longitude real_longitude
+
+        FROM search_history a, (
+          select uuid, reservation_id, max(status_updated_date) d
+          from search_history
+          where mid=#{mId}
+          and (
+            (
+              <![CDATA[ str_to_date(checkout, '%Y-%m-%d') <= (current_date() - 1) ]]>
+              and status='BOOKED'
+            )
+            or status='CANCEL'
+          )
+          group by reservation_id, uuid
+        ) c
+        where a.status_updated_date = c.d
+        and a.uuid = c.uuid
+        and a.reservation_id = c.reservation_id
+
+        order by a.real_check_in desc
+    </select>
+
+    <select id="getProcessingBook" resultMap="myPageResult">
+        SELECT a.mid mid, a.checkout checkout, a.checkin checkin, a.reservation_vendor_url reservationUrl, a.status status,
+--         b.name hotelName, b.address hotelAddress, b.phone hotelPhone, b.city hotelCity, b.longitude longitude, b.latitude latitude
+        a.real_hotel_name real_hotel_name, a.real_city_name real_city_name, a.real_check_in real_check_in, a.real_check_out real_check_out, a.real_price real_price, a.real_hotel_address real_hotel_address, a.real_hotel_phon real_hotel_phon,
+        a.real_latitude real_latitude, a.real_longitude real_longitude
+
+        FROM search_history a, (
+          select uuid, reservation_id, max(status_updated_date) d
+          from search_history
+          where mid=#{mId}
+          and <![CDATA[ str_to_date(checkin, '%Y-%m-%d') >= (current_date()) ]]>
+          group by reservation_id, uuid
+        ) c
+        where a.status_updated_date = c.d
+        and (
+          a.status='BOOKED'
+          or (a.status='BOOKING' and a.vendor='EXPEDIA' and a.reservation_id is not null)
+        )
+        and a.uuid = c.uuid
+        and a.reservation_id = c.reservation_id
+--         and a.wonder_hotel_info_id=b.id
+        <include refid="orderByStatusDate" />
+    </select>
+
+    <sql id="orderByStatusDate">
+        ORDER BY status_updated_date DESC
+    </sql>
+    
+    <update id="updateReservationVendorUrl">
+        UPDATE search_history SET reservation_vendor_url=#{reservationVendorUrl} WHERE id=#{id}
+    </update>
+
+</mapper>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wonders.hms.expedia.persistence.ExpediaHotelInfoMapper">
+    <resultMap id="expediaHotelResult" type="com.wonders.hms.expedia.vo.searchapi.ExpediaHotelInfo">
+        <result property="id" column="id"/>
+        <result property="propertyId" column="property_id"/>
+        <result property="latitude" column="latitude"/>
+        <result property="longitude" column="longitude"/>
+        <result property="country" column="country"/>
+        <result property="name" column="name"/>
+        <result property="city" column="city"/>
+        <result property="postalCode" column="postal_code"/>
+        <result property="address" column="address"/>
+        <result property="starRating" column="star_rating"/>
+        <result property="category" column="category"/>
+        <result property="checkin" column="checkin"/>
+        <result property="checkout" column="checkout"/>
+        <result property="images" column="images"/>
+        <result property="phone" column="phone"/>
+    </resultMap>
+
+
+    <select id="getAllHotels" resultMap="expediaHotelResult">
+        select id, property_id, longitude, latitude, country, name, city, postal_code, address, star_rating, category, checkin, checkout, images, phone
+        from expedia_hotel_info order by property_id
+    </select>
+
+    <select id="getHotelByHotelId" resultMap="expediaHotelResult">
+        select id, property_id, longitude, latitude, country, name, city, postal_code, address, star_rating, category, checkin, checkout, images, phone
+        from expedia_hotel_info where property_id =#{hotelId}
+    </select>
+
+    <select id="isExistHotel" resultType="java.lang.Boolean">
+        SELECT COUNT(*) FROM expedia_hotel_info WHERE property_id=#{propertyId}
+    </select>
+
+    <update id="updateHotelInfoFromApi" >
+       update expedia_hotel_info set star_rating=#{star_rating}, address1=#{address1}, address2=#{address2}, province=#{province},
+        hotel_teaser=#{hotel_teaser}, room_teaser=#{room_teaser}, location_teaser=#{location_teaser}, name=#{name}, city=#{city},
+        guest_rating=#{guest_rating}, guest_review_count=#{guest_review_count}, distance=#{distance}
+       where property_id=#{propertyId}
+    </update>
+
+    <update id="updateStaticInfo" >
+       update expedia_hotel_info
+       set latitude=#{location.coordinates.latitude},
+       longitude=#{location.coordinates.longitude},
+       country=#{address.countryCode},
+       postal_code=#{address.postalCode},
+       address=CONCAT(#{address.addressLine1}<if test="address.addressLine2 != null">, #{address.addressLine2}</if>),
+       address1=#{address.addressLine1},
+       address2=#{address.addressLine2},
+       phone=#{phone},
+       fax=#{fax},
+       category=#{category.name},
+       checkin=#{checkin.beginTime},
+       checkout=#{checkout.time},
+       fee_mandatory=#{fees.mandatory},
+       fee_optional=#{fees.optional},
+       policies=#{policy.knowBeforeYouGo},
+       amenities=#{description.amenity},
+       dining=#{description.dining},
+       renovation=#{description.renovation},
+       business_amenities=#{description.businessAmenity},
+       room=#{description.room},
+       attraction=#{description.attraction},
+       location=#{description.location},
+       star_rating=#{rating.property.rating},
+       province=#{address.stateProvinceName}
+       where property_id=#{propertyId}
+    </update>
+
+    <insert id="insertNewStaticInfo" parameterType="com.wonders.hms.expedia.vo.staticInfo.ExpediaHotelInfo">
+       insert into expedia_hotel_info(
+       property_id, name, latitude, longitude, country, postal_code,
+       address, address1, address2, phone, fax, category, checkin,
+       checkout, fee_mandatory, fee_optional, policies, amenities,
+       dining, renovation, business_amenities, room,
+       attraction, location, star_rating, province
+       )
+       values (
+       #{propertyId},
+       #{name},
+       #{location.coordinates.latitude},
+       #{location.coordinates.longitude},
+       #{address.countryCode},
+       #{address.postalCode},
+       CONCAT(#{address.addressLine1}<if test="address.addressLine2 != null">, #{address.addressLine2}</if>),
+       #{address.addressLine1},
+       #{address.addressLine2},
+       #{phone},
+       #{fax},
+       #{category.name},
+       #{checkin.beginTime},
+       #{checkout.time},
+       #{fees.mandatory},
+       #{fees.optional},
+       #{policy.knowBeforeYouGo},
+       #{description.amenity},
+       #{description.dining},
+       #{description.renovation},
+       #{description.businessAmenity},
+       #{description.room},
+       #{description.attraction},
+       #{description.location},
+       #{rating.property.rating},
+       #{address.stateProvinceName}
+       )
+    </insert>
+
+    <select id="getHotelCount" resultType="java.lang.Integer">
+        select count(*) from expedia_hotel_info
+    </select>
+
+    <select id="getHotelLimit" resultType="java.lang.Integer">
+        select * from expedia_hotel_info limit #{start}, #{end}
+    </select>
+
+    <select id="getHotelIdsLimit" resultType="java.lang.Long">
+        select property_id from expedia_hotel_info
+        order by property_id
+        limit #{offset}, #{limit}
+    </select>
+
+    <update id="updateMinMonPrice">
+        update expedia_hotel_info set mon_min_price=#{minPrice}
+        where property_id=#{propertyId}
+    </update>
+    <update id="updateMinTuePrice">
+        update expedia_hotel_info set tue_min_price=#{minPrice}
+        where property_id=#{propertyId}
+    </update>
+    <update id="updateMinWedPrice">
+        update expedia_hotel_info set wed_min_price=#{minPrice}
+        where property_id=#{propertyId}
+    </update>
+    <update id="updateMinThurPrice">
+        update expedia_hotel_info set thur_min_price=#{minPrice}
+        where property_id=#{propertyId}
+    </update>
+    <update id="updateMinFriPrice">
+        update expedia_hotel_info set fri_min_price=#{minPrice}
+        where property_id=#{propertyId}
+    </update>
+</mapper>

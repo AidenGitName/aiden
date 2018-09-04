@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wonders.hms.wonder.persistence.WonderHotelInfoMapper">
+    <resultMap id="wonderHotelInfoResult" type="com.wonders.hms.wonder.vo.WonderHotel">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="nameEng" column="name_eng"/>
+        <result property="address" column="address" />
+        <result property="star" column="star" />
+        <result property="rating" column="rating" />
+        <result property="teaser" column="hotel_teaser"/>
+        <result property="checkin" column="checkin" />
+        <result property="checkout" column="checkout" />
+        <result property="longitude" column="longitude" />
+        <result property="latitude" column="latitude" />
+        <result property="hotelVendorIndex" column="hotel_vendor_index_id" />
+        <result property="numberOfReviews" column="number_of_reviews"/>
+        <result property="city" column="city"/>
+        <result property="cityEng" column="city_eng"/>
+        <result property="country" column="country"/>
+        <result property="category" column="category"/>
+        <result property="postalCode" column="postal_code"/>
+        <result property="postalCode" column="postal_code"/>
+        <result property="hotelTeaser" column="hotel_teaser"/>
+        <result property="phone" column="phone"/>
+        <result property="agodaId" column="agoda_id"/>
+        <result property="bookingId" column="booking_id"/>
+        <result property="expediaId" column="expedia_id"/>
+    </resultMap>
+
+    <select id="getAllHotel" resultMap="wonderHotelInfoResult">
+        select * from wonder_hotel_info
+    </select>
+
+    <select id="getAllHotelWithVendors" resultMap="wonderHotelInfoResult">
+        select a.*, b.expedia_id expedia_id, b.agoda_id agoda_id, b.booking_id booking_id from wonder_hotel_info a, hotel_vendor_index b
+        where a.hotel_vendor_index_id = b.id
+    </select>
+
+    <select id="getHotels" resultMap="wonderHotelInfoResult">
+      SELECT
+      *, ST_Distance_Sphere(Point(#{place.longitude}, #{place.latitude}), pos) AS distance
+      <include refid="fromWonderHotelInfo"/>
+      <where>
+          <include refid="placeConditionalStatement"/>
+          <include refid="filterConditionalStatement"/>
+          <include refid="filterDistanceStatement"/>
+      </where>
+      <include refid="orderByStatement"/>
+      <include refid="limitStatement"/>
+    </select>
+
+    <select id="getHotelByCountryCode" resultMap="wonderHotelInfoResult">
+        SELECT *
+        <include refid="fromWonderHotelInfo"/>
+        <where>
+            <include refid="placeConditionalStatement"/>
+            <include refid="filterConditionalStatement"/>
+        </where>
+        <include refid="orderByStatement"/>
+        <include refid="limitStatement"/>
+    </select>
+
+    <select id="getTotalHotelCount" resultType="java.lang.Integer">
+        SELECT
+        COUNT(*)
+        <include refid="fromWonderHotelInfo"/>
+        <where>
+            <include refid="placeConditionalStatement"/>
+            <include refid="filterConditionalStatement"/>
+            <include refid="filterDistanceStatement"/>
+        </where>
+    </select>
+
+    <select id="getTotalHotelCountryByCountryCode" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        <include refid="fromWonderHotelInfo"/>
+        <where>
+            <include refid="placeConditionalStatement"/>
+            <include refid="filterConditionalStatement"/>
+        </where>
+    </select>
+
+    <select id="getHotelByHotelId" resultMap="wonderHotelInfoResult">
+        SELECT * <include refid="fromWonderHotelInfo"/> WHERE id=#{hotelId} LIMIT 0, 1
+    </select>
+
+    <select id="getHotelIdByHotelVendorIndexId" resultType="java.lang.Long">
+        SELECT id <include refid="fromWonderHotelInfo"/> WHERE hotel_vendor_index_id=#{hoteVendorIndexlId} LIMIT 0, 1
+    </select>
+
+    <select id="getAllCityEngAndCountry" resultType="java.util.Map">
+        SELECT city_eng, country <include refid="fromWonderHotelInfo"/> GROUP BY city_eng
+    </select>
+    
+    <select id="getHotelByExpediaHotelId" resultMap="wonderHotelInfoResult">
+        select * from wonder_hotel_info a, hotel_vendor_index b
+        where b.expedia_id = #{expediaPropertyId}
+        and a.hotel_vendor_index_id = b.id
+        limit 0, 1
+    </select>
+
+    <select id="getHotelByAgodaHotelId" resultMap="wonderHotelInfoResult">
+        select * from wonder_hotel_info a, hotel_vendor_index b
+        where b.agoda_id = #{agodaHotelId}
+        and a.hotel_vendor_index_id = b.id
+        limit 0, 1
+    </select>
+
+    <select id="getHotelByHotelIndexId" resultMap="wonderHotelInfoResult">
+        SELECT * from wonder_hotel_info WHERE hotel_vendor_index_id=#{hotelVendorIndexId}
+    </select>
+
+
+    <update id="updateCity">
+       UPDATE wonder_hotel_info SET city=#{cityName} WHERE city_eng=#{cityEng}
+    </update>
+
+    <update id="updateChangedWonderHotel">
+       UPDATE wonder_hotel_info
+       SET star=#{star},
+       checkin=#{checkin},
+       checkout=#{checkout},
+       checkout=#{checkout},
+       category=#{category},
+       phone=#{phone}
+       where id=#{id}
+    </update>
+    
+    <update id="calculateWeight">
+        <include refid="wonderHotelInfoWeightUpdate" />
+        where id=#{id}
+    </update>
+    
+    <insert id="insertWonderHotel" useGeneratedKeys="true" keyProperty="id">
+        insert into wonder_hotel_info (
+        longitude, latitude, pos, hotel_vendor_index_id, name, name_eng, city, city_eng, country,address,
+        rating, category, checkin, checkout, star, postal_code, hotel_teaser, number_of_reviews, phone
+        ) values (
+        #{longitude}, #{latitude}, PointFromText(CONCAT('POINT(',#{longitude},' ',#{latitude},')')),
+        #{hotelVendorIndex}, #{name}, #{nameEng}, #{city}, #{cityEng}, #{country}, #{address}, #{rating},
+        #{category}, #{checkin}, #{checkout}, #{star}, #{postalCode}, #{hotelTeaser}, #{numberOfReviews},
+         #{phone}
+        )
+    </insert>
+
+    <sql id="fromWonderHotelInfo">
+        FROM wonder_hotel_info
+    </sql>
+
+    <sql id="placeConditionalStatement">
+        <if test="place.countryCode != null">
+            AND country=#{place.countryCode}
+        </if>
+    </sql>
+
+
+    <sql id="filterConditionalStatement">
+        <if test="hotelSearchFilter != null">
+            <if test="hotelSearchFilter.categories != null">
+                AND category IN
+                <foreach collection="hotelSearchFilter.categories" item="category"  separator="," open="(" close=")">
+                    #{category}
+                </foreach>
+            </if>
+            <if test="hotelSearchFilter.stars != null">
+                AND
+                <foreach collection="hotelSearchFilter.stars" item="star" separator=" OR " open="(" close=")">
+                    (<![CDATA[ #{star} <= star AND star < #{star}+1 ]]>)
+                </foreach>
+            </if>
+            <if test="hotelSearchFilter.minPrice != null" >
+                AND (<![CDATA[ #{hotelSearchFilter.minPrice} <= weekly_price  ]]>)
+                AND (<![CDATA[  weekly_price is not null  ]]>)
+                AND (<![CDATA[  weekly_price > 0  ]]>)
+            </if>
+            <if test="hotelSearchFilter.maxPrice != null" >
+                AND (<![CDATA[ #{hotelSearchFilter.maxPrice} >= weekly_price  ]]>)
+                AND (<![CDATA[  weekly_price is not null  ]]>)
+                AND (<![CDATA[  weekly_price > 0  ]]>)
+            </if>
+        </if>
+        <if test="hotelSortTypeKind == 'PRICE_ASC' || hotelSortTypeKind == 'PRICE_DESC'">
+            AND (<![CDATA[  weekly_price is not null  ]]>)
+            AND (<![CDATA[  weekly_price > 0  ]]>)
+        </if>
+    </sql>
+
+    <sql id="filterDistanceStatement">
+        AND ST_Contains( ST_MakeEnvelope(
+              Point(
+                  (
+                      #{place.longitude} + (
+                          (#{distanceKm} * 1000)/ST_Distance_Sphere(Point(#{place.longitude}, #{place.latitude}), Point(#{place.longitude}+1, #{place.latitude}))
+                      )
+                  ),
+                  (
+                      #{place.latitude} + (
+                          (#{distanceKm} * 1000)/ST_Distance_Sphere(Point(#{place.longitude}, #{place.latitude}), Point(#{place.longitude}, #{place.latitude}+1))
+                      )
+                  )
+              ),
+              Point(
+                  (
+                      #{place.longitude} - (
+                          (#{distanceKm} * 1000)/ST_Distance_Sphere(Point(#{place.longitude}, #{place.latitude}), Point(#{place.longitude}+1, #{place.latitude}))
+                      )
+                  ),
+                  (
+                      #{place.latitude} - (
+                          (#{distanceKm} * 1000)/ST_Distance_Sphere(Point(#{place.longitude}, #{place.latitude}), Point(#{place.longitude}, #{place.latitude}+1))
+                      )
+                  )
+              )
+          ), pos )
+          AND ST_Distance_Sphere(Point(#{place.longitude}, #{place.latitude}), pos) <![CDATA[ <=  #{distanceKm} * 1000 ]]>
+    </sql>
+
+    <sql id="limitStatement">
+        LIMIT #{row}, #{offset}
+    </sql>
+
+    <sql id="orderByStatement">
+       ORDER BY
+        <if test="hotelSortTypeKind == 'BEST'">weight DESC</if>
+        <if test="hotelSortTypeKind == 'RATING'">rating DESC</if>
+        <if test="hotelSortTypeKind == 'PRICE_ASC'">weekly_price ASC</if>
+        <if test="hotelSortTypeKind == 'PRICE_DESC'">weekly_price DESC</if>
+        <if test="hotelSortTypeKind == 'STAR_ASC'">star ASC</if>
+        <if test="hotelSortTypeKind == 'STAR_DESC'">star DESC</if>
+    </sql>
+
+
+    <sql id="wonderHotelInfoWeightUpdate">
+        UPDATE wonder_hotel_info SET wonder_hotel_info.weight=(
+        (
+        IF(star >= 5.0, 10,
+        IF(star >= 4.5, 9,
+        IF(star >= 4.0, 8,
+        IF(star >= 3.5, 7,
+        IF(star >= 3.0, 6,
+        IF(star >= 2.5, 5,
+        IF(star >= 2.0, 4,
+        IF(star >= 1.5, 3,
+        IF(star >= 1.0, 2,
+        IF(star >= 0.5, 1, 0)))))))))) * 0.3)
+        + (
+        IF(rating >= 5.0, 10,
+        IF(rating >= 4.5, 9,
+        IF(rating >= 4.0, 8,
+        IF(rating >= 3.5, 7,
+        IF(rating >= 3.0, 6,
+        IF(rating >= 2.5, 5,
+        IF(rating >= 2.0, 4,
+        IF(rating >= 1.5, 3,
+        IF(rating >= 1.0, 2,
+        IF(rating >= 0.5, 1, 0)))))))))) * 0.5)
+        + (
+        IF(number_of_reviews >= 1000, 10,
+        IF(number_of_reviews >= 900, 9,
+        IF(number_of_reviews >= 700, 8,
+        IF(number_of_reviews >= 500, 7,
+        IF(number_of_reviews >= 300, 6,
+        IF(number_of_reviews >= 200, 5,
+        IF(number_of_reviews >= 100, 4,
+        IF(number_of_reviews >= 50, 3,
+        IF(number_of_reviews >= 20, 2,
+        IF(number_of_reviews >= 10, 1, 0))))))))))
+        * 0.2)
+        )
+    </sql>
+
+    <sql id="updatePos">
+        update wonder_hotel_info set pos=PointFromText(CONCAT('POINT(',longitude,' ',latitude,')'))
+    </sql>
+</mapper>

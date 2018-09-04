@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wonders.hms.hotel.persistence.HotelVendorMapper">
+    <resultMap id="hotelVendorIndexResult" type="com.wonders.hms.hotel.domain.HotelVendorIndex">
+        <result property="id" column="id"/>
+        <result property="agodaId" column="agoda_id"/>
+        <result property="bookingId" column="booking_id"/>
+        <result property="expediaId" column="expedia_id"/>
+    </resultMap>
+
+    <resultMap id="agodaIdsResult" type="com.wonders.hms.agoda.vo.AgodaAndWonderHotelIndex">
+        <result property="agodaHotelId" column="agoda_id" />
+        <result property="wonderHotelId" column="wonder_id" />
+    </resultMap>
+
+    <resultMap id="bookingIdsResult" type="com.wonders.hms.bookingDotCom.vo.BookingAndWonderHotelIndex">
+        <result property="bookingHotelId" column="booking_id" />
+        <result property="wonderHotelId" column="wonder_id" />
+    </resultMap>
+
+    <resultMap id="expediaIdsResult" type="com.wonders.hms.expedia.vo.ExpediaAndWonderHotelIndex">
+        <result property="expediaId" column="expedia_id" />
+        <result property="wonderHotelId" column="wonder_id" />
+    </resultMap>
+
+    <select id="getHotelVendorIndex" resultMap="hotelVendorIndexResult">
+     SELECT * FROM hotel_vendor_index WHERE id=#{id}
+   </select>
+
+    <select id="getCountHotelVendorIndexWithExpedia" resultType="java.lang.Integer">
+      SELECT count(*) FROM hotel_vendor_index WHERE expedia_id=#{expediaId}
+    </select>
+
+    <insert id="insertHotelVendorIndex" parameterType="com.wonders.hms.hotel.domain.HotelVendorIndex" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO hotel_vendor_index(
+        agoda_id
+        <if test="bookingId != null">
+            , booking_id
+        </if>
+        <if test="expediaId != null">
+            , expedia_id
+        </if>
+        )
+        VALUES(
+        #{agodaId}
+        <if test="bookingId != null">
+            , #{bookingId}
+        </if>
+        <if test="expediaId != null">
+            , #{expediaId}
+        </if>
+        );
+    </insert>
+
+    <update id="updateHotelVendorIndex" parameterType="com.wonders.hms.hotel.domain.HotelVendorIndex">
+        update hotel_vendor_index
+        <set>
+            <if test="agoda_id != null">agoda_id=#{agodaId},</if>
+            <if test="booking_id != null">booking_id=#{bookingId},</if>
+            <if test="expedia_id != null">expedia_id=#{expediaId},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <update id="setNullHotelVendorId">
+        update hotel_vendor_index
+        set #{column}=null
+        where id=#{id}
+    </update>
+
+    <update id="setExpediaIndex" parameterType="hashmap">
+       update hotel_vendor_index set expedia_id = #{expediaId} where agoda_id = #{agodaId}
+   </update>
+
+    <update id="setAgodaIndex" parameterType="hashmap">
+       update hotel_vendor_index set agoda_id = #{agodaId} where expedia_id = #{expediaId}
+   </update>
+
+    <select id="getAgodaIds" parameterType="java.util.HashMap" resultMap="agodaIdsResult">
+        select a.agoda_id agoda_id, b.id wonder_id from hotel_vendor_index a, wonder_hotel_info b where a.id in
+        <foreach collection="vendorIndex" item="item"  separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and b.hotel_vendor_index_id = a.id
+        and a.agoda_id is not null
+    </select>
+
+    <select id="getBookingIds" parameterType="java.util.HashMap" resultMap="bookingIdsResult">
+        select a.booking_id booking_id, b.id wonder_id from hotel_vendor_index a, wonder_hotel_info b where a.id in
+        <foreach collection="vendorIndex" item="item"  separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and b.hotel_vendor_index_id = a.id
+        and a.booking_id is not null
+    </select>
+
+    <select id="getExpediaIds" parameterType="java.util.HashMap" resultMap="expediaIdsResult">
+        select a.expedia_id expedia_id, b.id wonder_id from hotel_vendor_index a, wonder_hotel_info b where a.id in
+        <foreach collection="vendorIndex" item="item"  separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and b.hotel_vendor_index_id = a.id
+        and a.expedia_id is not null
+    </select>
+
+    <select id="getAllBookingIds" resultMap="bookingIdsResult">
+        select a.booking_id booking_id, b.id wonder_id from hotel_vendor_index a, wonder_hotel_info b
+        where b.hotel_vendor_index_id = a.id and a.booking_id is not null
+    </select>
+    
+    <select id="getAllByExpediaId" resultMap="hotelVendorIndexResult">
+        select * from hotel_vendor_index where expedia_id = #{expediaId}
+    </select>
+
+    <select id="getHotelVendorIdWithBookingId" resultType="java.lang.Long">
+        SELECT id FROM hotel_vendor_index WHERE booking_id = #{bookingId}
+    </select>
+</mapper>

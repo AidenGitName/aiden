@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wonders.hms.expedia.persistence.ExpediaHotelImageMapper">
+
+    <resultMap id="expediaHotelImage" type="com.wonders.hms.expedia.vo.ExpediaHotelImage">
+        <result property="propertyId" column="wonder_hotel_id" />
+        <result property="url" column="url" />
+    </resultMap>
+
+    <select id="getImages" parameterType="java.util.Set" resultMap="expediaHotelImage" >
+        select c.id wonder_hotel_id, a.url from expedia_hotel_image a, hotel_vendor_index b, wonder_hotel_info c
+        where c.hotel_vendor_index_id = b.id
+        and b.expedia_id = a.property_id
+        and c.id in
+     <foreach collection="propertyId" item="item" separator="," close=")" open="(">
+        #{item}
+     </foreach>
+    </select>
+
+    <insert id="insertImages">
+        INSERT INTO expedia_hotel_image (property_id, url, is_small_img) VALUES
+        <foreach collection="images" item="image" separator=",">
+            (#{propertyId}, #{image.url}, #{image.isSmallImg})
+        </foreach>
+    </insert>
+    
+</mapper>

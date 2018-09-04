@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wonders.hms.place.persistence.GoolgePlaceInfoMapper">
+    <insert id="insertGooglePlaceInfo">
+        INSERT INTO google_place_info (`key`, `value`) VALUES (#{key}, #{value}) ON DUPLICATE KEY UPDATE `value`=#{value}
+    </insert>
+
+    <select id="getGooglePlaceInfo" resultType="java.lang.String">
+        SELECT `value` FROM google_place_info WHERE `key`=#{key}
+    </select>
+
+    <update id="updateGooglePlaceInfoTimeAndHit">
+        UPDATE google_place_info SET hit_count=hit_count+1  WHERE `key`=#{key}
+    </update>
+
+    <delete id="deleteGooglePlaceInfo">
+        DELETE FROM google_place_info WHERE `key`=#{key}
+    </delete>
+</mapper>

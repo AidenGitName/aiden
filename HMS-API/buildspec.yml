@@ -1,0 +1,40 @@
+version: 0.2
+
+#env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+
+phases:
+  #install:
+    #commands:
+      # - command
+      # - command
+  #pre_build:
+    #commands:
+      # - command
+      # - command
+  build:
+    commands:
+       - gradle clean --stacktrace
+       - gradle build -x test --stacktrace
+  post_build:
+    commands:
+       - mkdir -p deploy
+       - ls -l build/libs
+       - cp build/libs/hms-*.war deploy/ROOT.war
+       - cp appspec.yml deploy/
+       - cp scripts/* deploy/
+       - ls -l deploy
+artifacts:
+  files:
+     - '**/*'
+    # - location
+  discard-paths: yes
+  base-directory: deploy
+cache:
+  paths:
+    - '/root/.gradle/caches/**/*'

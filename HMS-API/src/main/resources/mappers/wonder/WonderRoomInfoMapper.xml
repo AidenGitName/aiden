@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wonders.hms.wonder.persistence.WonderRoomInfoMapper">
+    <insert id="insertWonderRoomInfo" parameterType="com.wonders.hms.room.vo.CommonRoom">
+        INSERT INTO wonder_room_info (wonder_hotel_info_id, name, url, hotel_vendor_kind)
+        VALUES
+        <foreach collection="commonRooms" item="commonRoom" separator=" , ">
+          (#{commonRoom.hotelId}, #{commonRoom.name}, #{commonRoom.url}, #{commonRoom.hotelVendorKind})
+        </foreach>
+    </insert>
+
+    <select id="getWonderRoomInfo" resultType="java.util.Map">
+        SELECT * FROM wonder_room_info WHERE wonder_hotel_info_id=#{wonderHotelInfoId}
+    </select>
+
+</mapper>

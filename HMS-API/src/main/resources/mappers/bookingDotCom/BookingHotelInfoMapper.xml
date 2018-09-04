@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wonders.hms.bookingDotCom.persistence.BookingHotelInfoMapper">
+    <resultMap id="bookingHotelInfoResult" type="com.wonders.hms.bookingDotCom.hotel.vo.HotelData">
+        <result property="id" column="id"/>
+        <result property="bookingId" column="booking_id"/>
+        <result property="defaultLanguage" column="default_language"/>
+        <result property="deepLinkUrl" column="deep_link_url"/>
+        <result property="name" column="name"/>
+        <result property="chainId" column="chain_id" typeHandler="com.wonders.hms.util.JSONTypeHandler"/>
+        <result property="exactClass" column="exact_class"/>
+        <result property="hotelTypeId" column="hotel_type_id"/>
+        <result property="ranking" column="ranking"/>
+        <result property="spokenLanguage" column="spoken_language" typeHandler="com.wonders.hms.util.JSONTypeHandler"/>
+        <result property="country" column="country"/>
+        <result property="checkinCheckoutTime.checkoutFrom" column="checkout_from"/>
+        <result property="checkinCheckoutTime.checkoutTo" column="checkout_to"/>
+        <result property="checkinCheckoutTime.checkinFrom" column="checkin_from"/>
+        <result property="checkinCheckoutTime.checkinTo" column="checkin_to"/>
+        <result property="preferred" column="preferred"/>
+        <result property="maxRoomsInReservation" column="max_rooms_in_reservation"/>
+        <result property="hotelPhotos" column="hotel_photos" typeHandler="com.wonders.hms.util.JSONTypeHandler"/>
+        <result property="classIsEstimated" column="class_is_estimated"/>
+        <result property="hotelPolicies" column="hotel_policies" typeHandler="com.wonders.hms.util.JSONTypeHandler"/>
+        <result property="reviewScore" column="review_score"/>
+        <result property="hotelFacilities" column="hotel_facilities" typeHandler="com.wonders.hms.util.JSONTypeHandler"/>
+        <result property="bookDomesticWithoutCcDetails" column="book_domestic_without_cc_details"/>
+        <result property="numberOfRooms" column="number_of_rooms"/>
+        <result property="location.latitude" column="latitude"/>
+        <result property="location.longitude" column="longitude"/>
+        <result property="hotelDescription" column="hotel_description"/>
+        <result property="url" column="url"/>
+        <result property="currency" column="currency"/>
+        <result property="address" column="address"/>
+        <result property="hotelierWelcomeMessage" column="hotelier_welcome_message"/>
+        <result property="hotelImportantInformation" column="hotel_important_information"/>
+        <result property="paymentDetails" column="payment_details" typeHandler="com.wonders.hms.util.JSONTypeHandler"/>
+        <result property="maxPersonInReservation" column="max_person_in_reservation"/>
+        <result property="districtId" column="district_id"/>
+        <result property="zip" column="zip"/>
+        <result property="hotelClass" column="class"/>
+        <result property="city" column="city"/>
+        <result property="numberOfReviews" column="number_of_reviews"/>
+    </resultMap>
+
+    <select id="getHotelImages" resultType="java.util.HashMap">
+        SELECT booking_id, hotel_photos FROM booking_hotel_info WHERE booking_id in
+        <foreach collection="bookingIds" item="bookingId" separator="," open="(" close=")">
+            #{bookingId}
+        </foreach>
+    </select>
+    <select id="getHotel" resultMap="bookingHotelInfoResult">
+      SELECT * FROM booking_hotel_info WHERE booking_id = #{booking_id}
+    </select>
+
+    <insert id="insertHotel" parameterType="com.wonders.hms.bookingDotCom.hotel.vo.HotelData">
+        INSERT INTO booking_hotel_info(
+            booking_id, default_language, deep_link_url, name, chain_id, exact_class,
+            hotel_type_id, ranking, spoken_language, country, checkout_from, checkout_to,
+            checkin_from, checkin_to, preferred, max_rooms_in_reservation, hotel_photos,
+            class_is_estimated, hotel_policies, review_source, hotel_facilities,
+            book_domestic_without_cc_details, number_of_rooms, latitude, longitude,
+            hotel_description, url, currency, address, hotelier_welcome_message,
+            hotel_important_information, payment_details, max_person_in_reservation,
+            district_id, zip, city_id, city, number_of_reviews
+        )
+        VALUES(
+            #{bookingId}, #{hotelData.defaultLanguage}, #{hotelData.deepLinkUrl}, #{hotelData.name},
+            #{hotelData.chainId, typeHandler=com.wonders.hms.util.JSONTypeHandler},
+            #{hotelData.exactClass}, #{hotelData.hotelTypeId}, #{hotelData.ranking},
+            #{hotelData.spokenLanguage, typeHandler=com.wonders.hms.util.JSONTypeHandler}, #{hotelData.country},
+            #{hotelData.checkinCheckoutTime.checkoutFrom}, #{hotelData.checkinCheckoutTime.checkoutTo},
+            #{hotelData.checkinCheckoutTime.checkinFrom}, #{hotelData.checkinCheckoutTime.checkinTo}, #{hotelData.preferred},
+            #{hotelData.maxRoomsInReservation}, #{hotelData.hotelPhotos, typeHandler=com.wonders.hms.util.JSONTypeHandler},
+            #{hotelData.classIsEstimated}, #{hotelData.hotelPolicies, typeHandler=com.wonders.hms.util.JSONTypeHandler},
+            #{hotelData.reviewScore}, #{hotelData.hotelFacilities, typeHandler=com.wonders.hms.util.JSONTypeHandler},
+            #{hotelData.bookDomesticWithoutCcDetails}, #{hotelData.numberOfRooms}, #{hotelData.location.latitude},
+            #{hotelData.location.longitude}, #{hotelData.hotelDescription}, #{hotelData.url}, #{hotelData.currency},
+            #{hotelData.address}, #{hotelData.hotelierWelcomeMessage}, #{hotelData.hotelImportantInformation},
+            #{hotelData.paymentDetails, typeHandler=com.wonders.hms.util.JSONTypeHandler}, #{hotelData.maxPersonInReservation},
+            #{hotelData.districtId}, #{hotelData.zip}, #{hotelData.cityId}, #{hotelData.city}, #{hotelData.numberOfReviews}
+        );
+    </insert>
+
+    <update id="updateHotel">
+      UPDATE booking_hotel_info
+        <set>
+            <if test="hotelData.defaultLanguage != null">default_language=#{hotelData.defaultLanguage},</if>
+            <if test="hotelData.deepLinkUrl != null">deep_link_url=#{hotelData.deepLinkUrl},</if>
+            <if test="hotelData.name != null">name=#{hotelData.name},</if>
+            <if test="hotelData.chainId != null">chain_id=#{hotelData.chainId, typeHandler=com.wonders.hms.util.JSONTypeHandler},</if>
+            <if test="hotelData.exactClass != null">exact_class=#{hotelData.exactClass},</if>
+            <if test="hotelData.hotelTypeId != null">hotel_type_id=#{hotelData.hotelTypeId},</if>
+            <if test="hotelData.ranking != null">ranking=#{hotelData.ranking},</if>
+            <if test="hotelData.spokenLanguage != null">spoken_language=#{hotelData.spokenLanguage, typeHandler=com.wonders.hms.util.JSONTypeHandler},</if>
+            <if test="hotelData.country != null">country=#{hotelData.country},</if>
+            <if test="hotelData.preferred != null">preferred=#{hotelData.preferred},</if>
+            <if test="hotelData.checkinCheckoutTime != null">checkout_from=#{hotelData.checkinCheckoutTime.checkoutFrom},</if>
+            <if test="hotelData.checkinCheckoutTime != null">checkout_to=#{hotelData.checkinCheckoutTime.checkoutTo},</if>
+            <if test="hotelData.checkinCheckoutTime != null">checkin_from=#{hotelData.checkinCheckoutTime.checkinFrom},</if>
+            <if test="hotelData.checkinCheckoutTime != null">checkin_to=#{hotelData.checkinCheckoutTime.checkinTo},</if>
+            <if test="hotelData.maxRoomsInReservation != null">max_rooms_in_reservation=#{hotelData.maxRoomsInReservation},</if>
+            <if test="hotelData.hotelPhotos != null">hotel_photos=#{hotelData.hotelPhotos, typeHandler=com.wonders.hms.util.JSONTypeHandler},</if>
+            <if test="hotelData.classIsEstimated != null">class_is_estimated=#{hotelData.classIsEstimated},</if>
+            <if test="hotelData.hotelPolicies != null">hotel_policies=#{hotelData.hotelPolicies, typeHandler=com.wonders.hms.util.JSONTypeHandler},</if>
+            <if test="hotelData.reviewScore != null">review_score=#{hotelData.reviewScore},</if>
+            <if test="hotelData.hotelFacilities != null">hotel_facilities=#{hotelData.hotelFacilities, typeHandler=com.wonders.hms.util.JSONTypeHandler},</if>
+            <if test="hotelData.bookDomesticWithoutCcDetails != null">book_domestic_without_cc_details=#{hotelData.bookDomesticWithoutCcDetails},</if>
+            <if test="hotelData.numberOfRooms != null">number_of_rooms=#{hotelData.numberOfRooms},</if>
+            <if test="hotelData.location != null">latitude=#{hotelData.location.latitude},</if>
+            <if test="hotelData.location != null">longitude=#{hotelData.location.longitude},</if>
+            <if test="hotelData.hotelDescription != null">hotel_description=#{hotelData.hotelDescription},</if>
+            <if test="hotelData.url != null">url=#{hotelData.url},</if>
+            <if test="hotelData.currency != null">currency=#{hotelData.currency},</if>
+            <if test="hotelData.address != null">address=#{hotelData.address},</if>
+            <if test="hotelData.hotelierWelcomeMessage != null">hotelier_welcome_message=#{hotelData.hotelierWelcomeMessage},</if>
+            <if test="hotelData.hotelImportantInformation != null">hotel_important_information=#{hotelData.hotelImportantInformation},</if>
+            <if test="hotelData.paymentDetails != null">payment_details=#{hotelData.paymentDetails, typeHandler=com.wonders.hms.util.JSONTypeHandler},</if>
+            <if test="hotelData.maxPersonInReservation != null">max_person_in_reservation=#{hotelData.maxPersonInReservation},</if>
+            <if test="hotelData.districtId != null">district_id=#{hotelData.districtId},</if>
+            <if test="hotelData.zip != null">zip=#{hotelData.zip},</if>
+            <if test="hotelData.cityId != null">city_id=#{hotelData.cityId},</if>
+            <if test="hotelData.city != null">city=#{hotelData.city},</if>
+            <if test="hotelData.numberOfReviews != null">number_of_reviews=#{hotelData.numberOfReviews},</if>
+        </set>
+      WHERE booking_id = #{bookingId}
+    </update>
+
+    <delete id="deleteHotel">
+        DELETE FROM booking_hotel_info WHERE booking_id = #{bookingId}
+    </delete>
+</mapper>

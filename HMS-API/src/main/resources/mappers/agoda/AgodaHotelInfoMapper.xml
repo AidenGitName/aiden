@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wonders.hms.agoda.persistence.AgodaHotelInfoMapper">
+    <resultMap id="agodaHotelInfoResult" type="com.wonders.hms.agoda.vo.AgodaHotel">
+        <result property="id" column="id" />
+        <result property="hotelId" column="hotel_id" />
+        <result property="chainId" column="chain_id" />
+        <result property="chainName" column="chain_name" />
+        <result property="brandId" column="brand_id" />
+        <result property="brandName" column="brand_name" />
+        <result property="hotelName" column="hotel_name" />
+        <result property="hotelFormerlyName" column="hotel_formerly_name" />
+        <result property="hotelTranslatedName" column="hotel_translated_name" />
+        <result property="addressLine1" column="addressline1" />
+        <result property="addressLine2" column="addressline2" />
+        <result property="zipcode" column="zipcode" />
+        <result property="city" column="city" />
+        <result property="state" column="state" />
+        <result property="country" column="country" />
+        <result property="countryIsoCode" column="countryisocode" />
+        <result property="starRating" column="star_rating" />
+        <result property="longitude" column="longitude" />
+        <result property="latitude" column="latitude" />
+        <result property="url" column="url" />
+        <result property="checkin" column="checkin" />
+        <result property="checkout" column="checkout" />
+        <result property="numberRooms" column="numberrooms" />
+        <result property="numberFloors" column="numberfloors" />
+        <result property="yearOpened" column="yearopened" />
+        <result property="yearEnovated" column="yearrenovated" />
+        <result property="photo1" column="photo1" />
+        <result property="photo2" column="photo2" />
+        <result property="photo3" column="photo3" />
+        <result property="photo4" column="photo4" />
+        <result property="photo5" column="photo5" />
+        <result property="overview" column="overview" />
+        <result property="ratesFrom" column="rates_from" />
+        <result property="continentId" column="continent_id" />
+        <result property="continentName" column="continent_name" />
+        <result property="cityId" column="city_id" />
+        <result property="countryId" column="country_id" />
+        <result property="numberOfReviews" column="number_of_reviews" />
+        <result property="ratingAverage" column="rating_average" />
+        <result property="ratesCurrency" column="rates_currency" />
+        <result property="ratesFromExclusive" column="rates_from_exclusive" />
+        <result property="accommodationType" column="accommodation_type" />
+    </resultMap>
+
+    <select id="getHotels" resultMap="agodaHotelInfoResult">
+      <![CDATA[
+      SELECT
+      *,
+      ( 6371 * acos( cos( radians(  #{place.latitude} ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( #{place.longitude} ) )
+      + sin( radians(  #{place.latitude} ) ) * sin( radians( latitude ) ) ) ) AS distance
+      FROM
+      agoda_hotel_info
+      HAVING distance < #{distanceKm}
+      ORDER BY  distance asc
+      limit 0, 150
+      ]]>
+    </select>
+
+    <select id="getAllHotels" resultMap="agodaHotelInfoResult">
+        select * from agoda_hotel_info
+    </select>
+
+    <select id="getHotelByHotelId" resultMap="agodaHotelInfoResult">
+        select * from agoda_hotel_info where hotel_id=#{hotelId}
+    </select>
+    
+    <update id="updateHotel">
+        update agoda_hotel_info set
+        chain_id = #{chainId},
+        chain_name =#{chainName},
+        brand_id=#{brandId},
+        brand_name=#{brandName},
+        hotel_name=#{hotelName},
+        hotel_formerly_name=#{hotelFormerlyName},
+        hotel_translated_name=#{hotelTranslatedName},
+        addressline1=#{addressLine1},
+        addressline2=#{addressLine2},
+        zipcode=#{zipcode},
+        city=#{city},
+        state=#{state},
+        country=#{country},
+        countryisocode=#{countryIsoCode},
+        star_rating=#{starRating},
+        longitude=#{longitude},
+        latitude=#{latitude},
+        url=#{url},
+        checkin=#{checkin},
+        checkout=#{checkout},
+        numberrooms=#{numberRooms},
+        numberfloors=#{numberFloors},
+        yearopened=#{yearOpened},
+        yearrenovated=#{yearEnovated},
+        photo1=#{photo1},
+        photo2=#{photo2},
+        photo3=#{photo3},
+        photo4=#{photo4},
+        photo5=#{photo5},
+        overview=#{overview},
+        rates_from=#{ratesFrom},
+        continent_id=#{continentId},
+        continent_name=#{continentName},
+        city_id=#{cityId},
+        country_id=#{countryId},
+        number_of_reviews=#{numberOfReviews},
+        rating_average=#{ratingAverage},
+        rates_currency=#{ratesCurrency},
+        rates_from_exclusive=#{ratesFromExclusive},
+        accommodation_type=#{accommodationType}
+        where hotel_id = #{hotelId}
+    </update>
+    
+    <insert id="insertHotel">
+        insert into agoda_hotel_info (
+        hotel_id, chain_id, chain_name, brand_id, brand_name, hotel_name, hotel_formerly_name, hotel_translated_name,
+        addressline1, addressline2, zipcode, city, state, country, countryisocode, star_rating, longitude,
+        latitude, url,checkin,checkout,numberrooms,numberfloors,yearopened,yearrenovated, photo1, photo2, photo3,
+        photo4, photo5, overview, rates_from, continent_id, continent_name, city_id, country_id, number_of_reviews, rating_average,
+        rates_currency, rates_from_exclusive, accommodation_type
+        )
+        values (
+        #{hotelId},#{chainId}, #{chainName},#{brandId}, #{brandName}, #{hotelName}, #{hotelFormerlyName}, #{hotelTranslatedName},
+        #{addressLine1}, #{addressLine2}, #{zipcode}, #{city}, #{state}, #{country}, #{countryIsoCode}, #{starRating}, #{longitude},
+        #{latitude}, #{url}, #{checkin}, #{checkout}, #{numberRooms}, #{numberFloors}, #{yearOpened}, #{yearEnovated}, #{photo1},
+        #{photo2}, #{photo3}, #{photo4}, #{photo5}, #{overview}, #{ratesFrom}, #{continentId}, #{continentName}, #{cityId}, #{countryId},
+        #{numberOfReviews}, #{ratingAverage}, #{ratesCurrency}, #{ratesFromExclusive}, #{accommodationType}
+        )
+    </insert>
+</mapper>

@@ -1,6 +1,5 @@
 package com.example.demo3;
 
-import com.example.demo3.persistence.WebBoardRepository;
 import com.example.demo3.persistence.WepReplyRepository;
 import com.example.demo3.vo.WebBoard;
 import com.example.demo3.vo.WebReply;

@@ -14,4 +14,8 @@ public class LoginController {
     public void accessDenied(){
 
     }
+    @GetMapping("/logout")
+    public void logout(){
+
+    }
 }

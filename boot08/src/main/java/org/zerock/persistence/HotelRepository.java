@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface HotelRepository extends CrudRepository<HotelAmenity, Integer> {
 
-    @Query
+    @Query("SELECT hotelId FROM HotelInfo")
     List<Integer> getAllByHotelId();
 
+    @Query("SELECT info.hotelId FROM HotelInfo info WHERE info.hotelId NOT IN (SELECT amenity.hotelId FROM HotelAmenity amenity) and info.hotelId > 137584")
+    List<Integer> getAllbyHotelIds();
 }

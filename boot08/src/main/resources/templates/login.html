@@ -1,34 +1,33 @@
-<html xmlns:th="http://www.thymeleaf.org/">
+<html xmlns:th="http://www.thymeleaf.org">
+
 <head>
+    <title>LOGIN PAGE</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Login Page</title>
 </head>
 <body>
 
-<h2>COSTOM LOGIN PAGE</h2>
+<h2>CUSTOM LOGIN PAGE</h2>
 
 <div th:if="${param.error != null}">
-    <h2>Invalid UserId or Password</h2>
-    <h2 th:value="${param.error}">에러</h2>
+    <h2>Invalid Username or password</h2>
+    <h2 th:value="${param.error}"></h2>
 </div>
 
 <div th:if="${param.logout != null}">
-    <h2>You have been looged out.</h2>
+    <h2>You have been logged out.</h2>
 </div>
-
-    <form method="post">
-        <p>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" value="user88" />
-        </p>
-        <p>
-            <label for="password">Password</label>
-            <input type="password" id="password" value="pw88" />
-        </p>
-        <!--token 값 처리-->
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button type="submit" class="btn">Log in</button>
-    </form>
+<form method="post">
+    <p>
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" value="user88" />
+    </p>
+    <p>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" value="pw88" />
+    </p>
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <button type="submit" class="btn">Log in</button>
+</form>
 
 </body>
 </html>

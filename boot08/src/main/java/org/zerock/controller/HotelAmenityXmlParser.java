@@ -26,6 +26,8 @@ public class HotelAmenityXmlParser {
     @Autowired
     private HotelRepository hotelRepository;
 
+    private int seccese = 0;
+
     // tag값의 정보를 가져오는 메소드
     private static String getTagValue(String tag, Element eElement) {
         NodeList nlList = eElement.getElementsByTagName(tag).item(0).getChildNodes();
@@ -43,7 +45,7 @@ public class HotelAmenityXmlParser {
 
                 // root tag
                 doc.getDocumentElement().normalize();
-                System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+                log.info("Root element :" + doc.getDocumentElement().getNodeName());
 
                 // 파싱할 tag
                 NodeList nList = doc.getElementsByTagName("roomtype_facility");
@@ -62,10 +64,7 @@ public class HotelAmenityXmlParser {
                     }
                 }
                 log.info("Parsing Amenity Size : " + hotelAmenitySet.size());
-
-                hotelAmenitySet.forEach(hotelAmenity -> {
-                    hotelRepository.save(hotelAmenity);
-                });
+                hotelRepository.saveAll(hotelAmenitySet);
         });
     }
 
@@ -87,13 +86,14 @@ public class HotelAmenityXmlParser {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         Document doc = null;
         int restart = 0;
+
         boolean fail = true;
         while (fail) {
             try {
                 DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-                Thread.sleep(2400);
                 doc = docBuilder.parse(url);
                 fail = false;
+                log.info("성공횟수 : " + ++this.seccese);
 
             } catch (ParserConfigurationException e) {
                 e.printStackTrace();
@@ -101,18 +101,19 @@ public class HotelAmenityXmlParser {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+                log.info(this.seccese + " 번 성공 이후 fail");
                 try {
                     if(restart ==2 ){
                         Thread.sleep(1200 * 1000);
+                        restart++;
                     } else {
                         restart++;
+                        this.seccese =0;
                         Thread.sleep(300 * 1000);
                     }
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
 
         }

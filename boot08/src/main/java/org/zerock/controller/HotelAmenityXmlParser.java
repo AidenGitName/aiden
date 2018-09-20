@@ -15,10 +15,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Log
 @Controller
@@ -27,6 +24,11 @@ public class HotelAmenityXmlParser {
     private HotelRepository hotelRepository;
 
     private int seccese = 0;
+
+    private long statTime;
+
+    private long startTime;
+    private Calendar calendar = Calendar.getInstance();
 
     // tag값의 정보를 가져오는 메소드
     private static String getTagValue(String tag, Element eElement) {
@@ -86,11 +88,20 @@ public class HotelAmenityXmlParser {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         Document doc = null;
         int restart = 0;
+        this.startTime = System.currentTimeMillis()/1000;
 
         boolean fail = true;
         while (fail) {
             try {
                 DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+
+                long runTIme = System.currentTimeMillis()/1000;
+                if(startTime+599 < runTIme){
+                    log.info("Running 599sec, Wait 20Min...");
+                    Thread.sleep(1200*1000);
+                    this.startTime = System.currentTimeMillis()/1000;
+                }
+
                 doc = docBuilder.parse(url);
                 fail = false;
                 log.info("성공횟수 : " + ++this.seccese);
@@ -103,17 +114,18 @@ public class HotelAmenityXmlParser {
                 e.printStackTrace();
                 log.info(this.seccese + " 번 성공 이후 fail");
                 try {
+                    restart++;
                     if(restart ==2 ){
                         Thread.sleep(1200 * 1000);
-                        restart++;
                     } else {
-                        restart++;
                         this.seccese =0;
                         Thread.sleep(300 * 1000);
                     }
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
 
         }

@@ -25,10 +25,9 @@ public class HotelAmenityXmlParser {
 
     private int seccese = 0;
 
-    private long statTime;
-
-    private long startTime;
-    private Calendar calendar = Calendar.getInstance();
+//    private long statTime;
+//
+//    private long startTime;
 
     // tag값의 정보를 가져오는 메소드
     private static String getTagValue(String tag, Element eElement) {
@@ -75,7 +74,7 @@ public class HotelAmenityXmlParser {
         log.info("Start HotelId : " + hotelIds.get(0));
         log.info("List Size : " + hotelIds.size());
         List<String> reqUrls = new ArrayList<>();
-        this.startTime = System.currentTimeMillis()/1000;
+//        this.startTime = System.currentTimeMillis()/1000;
         hotelIds.forEach(hotelId -> {
             String url = "http://xml.agoda.com/datafeeds/Feed.asmx/GetFeed?feed_id=14&apikey=8ba7c83a-72ab-4586-b806-1827f95ed4a6&mhotel_id=" + hotelId;
             reqUrls.add(url);
@@ -96,12 +95,12 @@ public class HotelAmenityXmlParser {
             try {
                 DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 
-                long runTIme = System.currentTimeMillis()/1000;
-                if(startTime+300 < runTIme){
-                    log.info("Running 300sec, Wait 5Min... "+seccese+"call..");
-                    Thread.sleep(300*1000);
-                    this.startTime = System.currentTimeMillis()/1000;
-                }
+//                long runTIme = System.currentTimeMillis()/1000;
+//                if(startTime+300 < runTIme){
+//                    log.info("Running 300sec, Wait 5Min... "+seccese+"call..");
+//                    Thread.sleep(600*1000);
+//                    this.startTime = System.currentTimeMillis()/1000;
+//                }
 
                 doc = docBuilder.parse(url);
                 fail = false;
@@ -115,7 +114,7 @@ public class HotelAmenityXmlParser {
                 e.printStackTrace();
                 log.info(this.seccese + " 번 성공 이후 fail");
                 try {
-                    this.startTime=System.currentTimeMillis()/1000;
+//                    this.startTime=System.currentTimeMillis()/1000;
                     restart++;
                     if(restart ==2 ){
                         Thread.sleep(1200 * 1000);
@@ -126,8 +125,8 @@ public class HotelAmenityXmlParser {
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
             }
 
         }

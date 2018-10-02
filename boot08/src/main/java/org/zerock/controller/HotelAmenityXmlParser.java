@@ -111,7 +111,8 @@ public class HotelAmenityXmlParser {
             } catch (SAXException e) {
                 e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                log.info("Agoda API key Lock");
                 log.info(this.seccese + " 번 성공 이후 fail");
                 try {
 //                    this.startTime=System.currentTimeMillis()/1000;
@@ -133,6 +134,10 @@ public class HotelAmenityXmlParser {
         return doc;
     }
 
+//    public static void main(String[] args){
+//        HotelAmenityXmlParser hotelAmenityXmlParser = new HotelAmenityXmlParser();
+//        hotelAmenityXmlParser.setHotelAmenity();
+//    }
 
 
 }

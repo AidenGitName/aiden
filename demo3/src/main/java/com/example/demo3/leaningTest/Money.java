@@ -15,12 +15,15 @@ public class Money implements Expression {
     public Money() {
     }
 
-    static  Money dollar(int amount){
-        return new Money(amount, "USD");
-    }
-    static  Money franc(int amount){
-        return new Money(amount, "CHF");
-    }
+//    static  Money dollar(int amount){
+//        return new Money(amount, "USD");
+//    }
+//    static  Money franc(int amount){
+//        return new Money(amount, "CHF");
+//    }
+static  Money moneyCurrency(int amount,String currency) {
+    return new Money(amount, currency);
+}
     @Override
     public Expression times(int multiplier){
          return new Money(amount * multiplier, currency);

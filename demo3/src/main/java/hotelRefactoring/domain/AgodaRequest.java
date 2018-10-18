@@ -6,6 +6,7 @@ import org.springframework.http.HttpRequest;
 public class AgodaRequest {
 
     public String serchList(HttpRequest request, HttpResponse response){
-        String query = request.
+        String query =null;
+        return query;
     }
 }

@@ -8,5 +8,6 @@ public interface Expression {
     // plus 선언
     Expression plus(Expression tenFrancs);
 
+    // times 선언
     Expression times(int multiplier);
 }
